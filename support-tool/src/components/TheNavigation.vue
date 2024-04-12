@@ -1,20 +1,16 @@
 <template>
   <header>
     <nav class="navbar is-dark">
-      <div class="navbar-brand">
-      <ul>
-        <li>
-          <button>Teams</button>
-        </li>
-        <li>
-          <button>Jeans</button>
-        </li>
-      </ul>
+    <div class="navbar-brand">
+        <a class="navbar-item" href="/"><img src="./../assets/images/icon.png"></a>
+        <a class="navbar-item" href="/"><img src="./../assets/images/cloud-drive-icon.png"></a>
+        <a class="button navbar-burger is-dark"></a> 
       </div>
     </nav>
   </header>
 </template>
 
-<style scoped>
-@import '/src/assets/css/test.css'
+<style>
+
+@import '/src/assets/css/bulma.min.css'
 </style>
