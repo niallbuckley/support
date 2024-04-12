@@ -1,8 +1,6 @@
 <template>
     <router-view></router-view>
-    <main>
-      <h1> Camera Direct </h1>
-    </main>
+    <h1> Camera Direct </h1>
   </template>
   <!-- 
   <script>
