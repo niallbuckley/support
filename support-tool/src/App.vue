@@ -2,7 +2,7 @@
   <the-navigation></the-navigation>
   <!--<main>
   <img alt="Vue logo" src="./assets/logo.png">
--  <HelloWorld msg="Welcome to Your Vue.js App"/>
+-  <HelloWorld msg="Welcome Support tool written in Vue"/>
   </main> -->
   <main>
   <router-view></router-view>

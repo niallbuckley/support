@@ -2,10 +2,8 @@
   <header>
     <nav class="navbar is-dark">
     <div class="navbar-brand">
-        <router-link class="navbar-item" to="/camera-direct">Camera Direct</router-link>
-        <a class="navbar-item" href="/"><img src="./../assets/images/icon.png"></a>
-        <a class="navbar-item" href="/"><img src="./../assets/images/cloud-drive-icon.png"></a>
-        <a class="button navbar-burger is-dark"></a> 
+       <a class="navbar-item" href="/"><img src="./../assets/images/icon.png"></a>
+        <router-link class="navbar-item" to="/camera-direct"> <img src="./../assets/images/cloud-drive-icon.png"></router-link>
       </div>
     </nav>
   </header>
