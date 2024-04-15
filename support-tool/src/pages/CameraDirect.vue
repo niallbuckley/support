@@ -2,23 +2,6 @@
     <router-view></router-view>
     <h1> Camera Direct </h1>
   </template>
-  <!-- 
-  <script>
-  export default {
-    props: ['id', 'name', 'memberCount'],
-    computed: {
-      teamMembersLink() {
-        // return '/teams/' + this.id + '?sort=asc';
-        return {
-          name: 'team-members',
-          params: { teamId: this.id },
-          query: { sort: 'asc' },
-        };
-        // this.$router.push({ name: 'team-members', params: { teamId: this.id } });
-      },
-    },
-  };
-  </script> -->
   
   <style scoped>
   li {

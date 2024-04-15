@@ -3,7 +3,7 @@
     <nav class="navbar is-dark">
     <div class="navbar-brand">
        <a class="navbar-item" href="/"><img src="./../assets/images/icon.png"></a>
-        <router-link class="navbar-item" to="/camera-direct"> <img src="./../assets/images/cloud-drive-icon.png"></router-link>
+        <router-link msg="Hello World" class="navbar-item" to="/camera-direct"> <img src="./../assets/images/cloud-drive-icon.png"></router-link>
       </div>
     </nav>
   </header>

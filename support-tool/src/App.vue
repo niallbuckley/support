@@ -1,22 +1,16 @@
 <template>
   <the-navigation></the-navigation>
-  <!--<main>
-  <img alt="Vue logo" src="./assets/logo.png">
--  <HelloWorld msg="Welcome Support tool written in Vue"/>
-  </main> -->
   <main>
   <router-view></router-view>
   </main>
 </template>
 
 <script>
-//import HelloWorld from './components/HelloWorld.vue';
 import TheNavigation from './components/TheNavigation.vue';
 
 export default {
   name: 'App',
   components: {
-    //HelloWorld,
     TheNavigation
   }
 }
