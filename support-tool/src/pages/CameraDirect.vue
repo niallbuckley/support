@@ -23,6 +23,7 @@
 
 <script>
 import CameraDirectResult from './../components/CameraDirectResult.vue';
+import axios from 'axios';
 
 export default {
   components: {
@@ -53,27 +54,25 @@ export default {
         this.isLoading = false;
         return;
       }
-      // Change to /api/v2/CameraDirect/VmsRequest?active_brand=eagleeyenetworks.com&esn=100c5908
-      // This endpoint will work if given non-cd cam ESN but will not work with non-cd cam MAC addr. 
-      fetch(`http://localhost:9992/api/v2/CameraDirect/VmsRequest?active_brand=eagleeyenetworks.com&${url}`, {method:'GET'})
-        .then((response) => {
-          if (response.ok) {
-            return response.json();
+      axios.get(`http://localhost:9992/api/v2/CameraDirect/VmsRequest?active_brand=eagleeyenetworks.com&${url}`)
+        .then(response => {
+          if (response.status === 200) {
+            return response.data;
           }
-        })
-        .then((data) => {
+        }).then(data => {
           this.isLoading = false;
           const results = [];
-          console.log(data.data)
-          results.push(data.data)
+          console.log(data.data);
+          results.push(data.data);
           console.log(results);
           this.results = results;
         })
-        .catch((error) => {
-          console.log(error);
+        .catch(error => {
+          console.error(error);
           this.isLoading = false;
-          this.error = 'Failed to fetch data - please try again later.';
+          this.error = `Could not get device data, ${error.response.status} status code ${error.response.data.Message || error.response.data.message}`;
         });
+
     },
 
     isEsn(identifier) {
