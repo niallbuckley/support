@@ -1,8 +1,64 @@
 <template>
     <router-view></router-view>
     <h1> Camera Direct </h1>
-  </template>
-  
+    <div>
+      <button @click="loadExperiences">Load Submitted Experiences</button>
+    </div>
+    <p v-if="isLoading">Loading...</p>
+    <p v-else-if="!isLoading && error">{{ error }}</p>
+    <ul v-else>
+      <camera-direct-result
+        v-for="result in results"
+        :key="result.device_id"
+        :device="result.device_id"
+        :name="result.name"
+      ></camera-direct-result>
+    </ul>
+</template>
+
+<script>
+import CameraDirectResult from './../components/CameraDirectResult.vue';
+
+export default {
+  components: {
+    CameraDirectResult,
+  },
+  data() {
+    return {
+      results: [],
+      isLoading: false,
+      error: null,
+    };
+  },
+  methods: {
+    loadExperiences() {
+      this.isLoading = true;
+      //this.error = "OK this is awesome";
+      // This can be changed to /api/v2/CameraDirect/VmsRequest?active_brand=eagleeyenetworks.com&esn=100c5908
+      fetch('http://localhost:9992/api/v2/CameraDirect/VmsRequest?active_brand=eagleeyenetworks.com&esn=100c5908', {method:'GET'})
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          }
+        })
+        .then((data) => {
+          this.isLoading = false;
+          const results = [];
+          console.log(data.data)
+          results.push(data.data)
+          console.log(results);
+          this.results = results;
+        })
+        .catch((error) => {
+          console.log(error);
+          this.isLoading = false;
+          this.error = 'Failed to fetch data - please try again later.';
+        });
+    },
+  }
+};
+</script>
+
   <style scoped>
   li {
     margin: 1rem 0;
