@@ -6,24 +6,26 @@
     </div>
     <p v-if="isLoading">Loading...</p>
     <p v-else-if="!isLoading && error">{{ error }}</p>
-    <p v-else-if = "!isLoading">{{ error }}</p>
-    <!-- <p
+    <!-- <p v-else-if = "!isLoading">{{ error }}</p>
+    <p
       v-else-if="!isLoading && (!results || results.length === 0)"
     >No stored experiences found. Start adding some survey results first.</p> -->
     <ul v-else>
-      <survey-result
+      <camera-direct-result
         v-for="result in results"
-        :key="result.id"
+        :key="result.device_id"
+        :device="result.device_id"
         :name="result.name"
-        :rating="result.rating"
-      ></survey-result>
+      ></camera-direct-result>
     </ul>
 </template>
 
 <script>
+import CameraDirectResult from './../components/CameraDirectResult.vue';
+
 export default {
   components: {
-    //SurveyResult,
+    CameraDirectResult,
   },
   data() {
     return {
@@ -35,8 +37,9 @@ export default {
   methods: {
     loadExperiences() {
       this.isLoading = true;
-      this.error = "OK this is awesome";
-      fetch('url', {headers:{"cookie":"auth_key=null"}})
+      //this.error = "OK this is awesome";
+      // This can be changed to /api/v2/CameraDirect/VmsRequest?active_brand=eagleeyenetworks.com&esn=100c5908
+      fetch('http://localhost:9992/api/v2/CameraDirect/VmsRequest?active_brand=eagleeyenetworks.com&esn=100c5908', {method:'GET'})
         .then((response) => {
           if (response.ok) {
             return response.json();
@@ -45,28 +48,18 @@ export default {
         .then((data) => {
           this.isLoading = false;
           const results = [];
-          for (const id in data) {
-            console.log("id: " + id);
-            results.push({id});
-            // results.push({
-            //   id: id,
-            //   name: data[id].name,
-            //   rating: data[id].rating,
-            // });
-          }
+          console.log(data.data)
+          results.push(data.data)
+          console.log(results);
           this.results = results;
         })
         .catch((error) => {
           console.log(error);
           this.isLoading = false;
           this.error = 'Failed to fetch data - please try again later.';
-          console.log("HEREEE")
         });
     },
   }
-  // mounted() {
-  //   this.loadExperiences();
-  // },
 };
 </script>
 
