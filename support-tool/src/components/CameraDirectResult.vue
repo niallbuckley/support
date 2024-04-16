@@ -2,14 +2,18 @@
   <li>
     <p>
       <span class="highlight">{{ device }}</span> is named
-      <span>{{ name }}</span>.
+      <span>{{ name }}</span>. Mac addr: 
+      <span>{{ mac_address }}</span> And Type:
+      <span>{{ type }}</span> Cluster: 
+      <span>{{ cluster }}</span> Account:
+      <span> {{ account }} </span>
     </p>
   </li>
 </template>
 
 <script>
 export default {
-  props: ['device', 'name']
+  props: ['device', 'name', 'mac_address', 'type', 'cluster', 'account']
 }
 
 </script>

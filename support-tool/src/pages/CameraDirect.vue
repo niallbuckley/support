@@ -2,7 +2,8 @@
     <router-view></router-view>
     <h1> Camera Direct </h1>
     <div>
-      <button @click="loadExperiences">Load Submitted Experiences</button>
+      <input type="text" v-model="searchInput" placeholder="Enter ESN/ Mac Address">
+      <button @click="loadDevice(searchInput)">Search</button>
     </div>
     <p v-if="isLoading">Loading...</p>
     <p v-else-if="!isLoading && error">{{ error }}</p>
@@ -11,7 +12,11 @@
         v-for="result in results"
         :key="result.device_id"
         :device="result.device_id"
+        :mac_address="result.mac_address"
         :name="result.name"
+        :type="result.type"
+        :account="result.account"
+        :cluster="result.cluster"
       ></camera-direct-result>
     </ul>
 </template>
@@ -28,14 +33,29 @@ export default {
       results: [],
       isLoading: false,
       error: null,
+      esnPattern : /^[0-9A-Fa-f]{8}$/,
+      macAddressPattern : /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/
     };
   },
   methods: {
-    loadExperiences() {
+    loadDevice(si) {
+      var url = "";
       this.isLoading = true;
-      //this.error = "OK this is awesome";
-      // This can be changed to /api/v2/CameraDirect/VmsRequest?active_brand=eagleeyenetworks.com&esn=100c5908
-      fetch('http://localhost:9992/api/v2/CameraDirect/VmsRequest?active_brand=eagleeyenetworks.com&esn=100c5908', {method:'GET'})
+      if (this.isEsn(si)){
+        url = "esn=" + si;
+      }
+      else if (this.isMac(si)) {
+        url = "mac_addr=" + encodeURIComponent(si);
+      }
+      else{
+        // error handling
+        this.error = "Not a valid MAC or ESN value!";
+        this.isLoading = false;
+        return;
+      }
+      // Change to /api/v2/CameraDirect/VmsRequest?active_brand=eagleeyenetworks.com&esn=100c5908
+      // This endpoint will work if given non-cd cam ESN but will not work with non-cd cam MAC addr. 
+      fetch(`http://localhost:9992/api/v2/CameraDirect/VmsRequest?active_brand=eagleeyenetworks.com&${url}`, {method:'GET'})
         .then((response) => {
           if (response.ok) {
             return response.json();
@@ -55,7 +75,16 @@ export default {
           this.error = 'Failed to fetch data - please try again later.';
         });
     },
+
+    isEsn(identifier) {
+      return this.esnPattern.test(identifier);
+    },
+    
+    isMac(identifier) {
+      return this.macAddressPattern.test(identifier);
+    }
   }
+
 };
 </script>
 
