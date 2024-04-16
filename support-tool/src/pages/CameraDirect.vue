@@ -12,7 +12,11 @@
         v-for="result in results"
         :key="result.device_id"
         :device="result.device_id"
+        :mac_address="result.mac_address"
         :name="result.name"
+        :type="result.type"
+        :account="result.account"
+        :cluster="result.cluster"
       ></camera-direct-result>
     </ul>
 </template>
@@ -44,11 +48,11 @@ export default {
         url = "mac_addr=" + encodeURIComponent(si);
       }
       else{
+        // error handling
         this.error = "Not a valid MAC or ESN value!";
         this.isLoading = false;
         return;
       }
-      console.log("Here"+url+"Here");
       // Change to /api/v2/CameraDirect/VmsRequest?active_brand=eagleeyenetworks.com&esn=100c5908
       // This endpoint will work if given non-cd cam ESN but will not work with non-cd cam MAC addr. 
       fetch(`http://localhost:9992/api/v2/CameraDirect/VmsRequest?active_brand=eagleeyenetworks.com&${url}`, {method:'GET'})
