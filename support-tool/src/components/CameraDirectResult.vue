@@ -1,14 +1,31 @@
 <template>
-  <li>
-    <p>
-      <span class="highlight">{{ device }}</span> is named
-      <span>{{ name }}</span>. Mac addr: 
-      <span>{{ mac_address }}</span> And Type:
-      <span>{{ type }}</span> Cluster: 
-      <span>{{ cluster }}</span> Account:
-      <span> {{ account }} </span>
-    </p>
-  </li>
+  <table>
+  <th colspan="2"> VMS Database </th>
+  <tr>
+    <td><strong>Device</strong></td>
+    <td>{{ device }}</td>
+  </tr>
+  <tr>
+    <td><strong>Name</strong></td>
+    <td>{{ name }}</td>
+  </tr>
+  <tr>
+    <td><strong>MAC Address</strong></td>
+    <td>{{ mac_address }}</td>
+  </tr>
+  <tr>
+    <td><strong>Type</strong></td>
+    <td>{{ type }}</td>
+  </tr>
+  <tr>
+    <td><strong>Cluster</strong></td>
+    <td>{{ cluster }}</td>
+  </tr>
+  <tr>
+    <td><strong>Account</strong></td>
+    <td>{{ account }}</td>
+  </tr>
+  </table>
 </template>
 
 <script>
@@ -19,31 +36,35 @@ export default {
 </script>
 
 <style scoped>
-li {
-  margin: 1rem 0;
-  border: 1px solid #ccc;
-  padding: 1rem;
+table {
+  width: 100%; /* Make the table fill the webpage width */
+  border-collapse: collapse;
+  margin-top: 20px;
 }
 
-h3,
-p {
-  font-size: 1rem;
-  margin: 0.5rem 0;
+/* Apply styles to table body cells (td) */
+td {
+  border: 1px solid #ddd; 
 }
 
-.highlight {
-  font-weight: bold;
+/* this needed to be added so the tds would align with midpoint of page (like headers)*/
+td:first-child{
+  width: 50%;
 }
 
-.rating--poor {
-  color: #b80056;
+th {
+  background-color: #f2f2f2; 
+  border: 1px solid #ddd; 
+  padding: 8px;
 }
 
-.rating--average {
-  color: #330075;
+/* Apply alternate background color to even rows */
+tr:nth-child(even) {
+  background-color: #f9f9f9; /* Lighter gray background for even rows */
 }
+th, td {
+  text-align: center;
+  vertical-align: middle;
+} 
 
-.rating--great {
-  color: #008327;
-}
 </style>
