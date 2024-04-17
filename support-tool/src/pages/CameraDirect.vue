@@ -7,7 +7,7 @@
     </div>
     <p v-if="isLoading">Loading...</p>
     <p v-else-if="!isLoading && error">{{ error }}</p>
-    <div v-else-if="results.length > 0">
+    <div v-else-if="searchInput">
         <camera-direct-result
           v-for="result in results"
           :key="result.device_id"
@@ -33,6 +33,7 @@ export default {
     return {
       results: [],
       isLoading: false,
+      searchInput: '',
       error: null,
       esnPattern : /^[0-9A-Fa-f]{8}$/,
       macAddressPattern : /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/
@@ -40,13 +41,14 @@ export default {
   },
   methods: {
     loadDevice(si) {
+      this.searchInput = si;
       var url = "";
       this.isLoading = true;
-      if (this.isEsn(si)){
-        url = "esn=" + si;
+      if (this.isEsn(this.searchInput)){
+        url = "esn=" + this.searchInput;
       }
-      else if (this.isMac(si)) {
-        url = "mac_addr=" + encodeURIComponent(si);
+      else if (this.isMac(this.searchInput)) {
+        url = "mac_addr=" + encodeURIComponent(this.searchInput);
       }
       else{
         // error handling
