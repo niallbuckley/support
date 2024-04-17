@@ -63,9 +63,7 @@ export default {
         }).then(data => {
           this.isLoading = false;
           const results = [];
-          console.log(data.data);
           results.push(data.data);
-          console.log(results);
           this.results = results;
         })
         .catch(error => {
