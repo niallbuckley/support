@@ -7,18 +7,18 @@
     </div>
     <p v-if="isLoading">Loading...</p>
     <p v-else-if="!isLoading && error">{{ error }}</p>
-    <ul v-else>
-      <camera-direct-result
-        v-for="result in results"
-        :key="result.device_id"
-        :device="result.device_id"
-        :mac_address="result.mac_address"
-        :name="result.name"
-        :type="result.type"
-        :account="result.account"
-        :cluster="result.cluster"
-      ></camera-direct-result>
-    </ul>
+    <div v-else-if="results.length > 0">
+        <camera-direct-result
+          v-for="result in results"
+          :key="result.device_id"
+          :device="result.device_id"
+          :mac_address="result.mac_address"
+          :name="result.name"
+          :type="result.type"
+          :account="result.account"
+          :cluster="result.cluster"
+        ></camera-direct-result>
+    </div>
 </template>
 
 <script>
@@ -57,14 +57,13 @@ export default {
       axios.get(`http://localhost:9992/api/v2/CameraDirect/VmsRequest?active_brand=eagleeyenetworks.com&${url}`)
         .then(response => {
           if (response.status === 200) {
+            this.error = null;
             return response.data;
           }
         }).then(data => {
           this.isLoading = false;
           const results = [];
-          console.log(data.data);
           results.push(data.data);
-          console.log(results);
           this.results = results;
         })
         .catch(error => {
