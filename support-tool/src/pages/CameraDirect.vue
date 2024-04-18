@@ -5,9 +5,9 @@
       <input type="text" v-model="searchInput" placeholder="Enter ESN/ Mac Address">
       <button @click="loadDevice(searchInput)">Search</button>
     </div>
-    <p v-if="isLoading">Loading...</p>
-    <p v-else-if="!isLoading && error">{{ error }}</p>
-    <div v-else-if="searchInput">
+    <p v-if="isLoadingVms">Loading...</p>
+    <p v-else-if="!isLoadingVms && error">{{ error }}</p>
+    <div v-else-if="!isLoadingVms  && searchInput">
         <camera-direct-result
           v-for="result in results"
           :key="result.device_id"
@@ -19,6 +19,7 @@
           :cluster="result.cluster"
         ></camera-direct-result>
     </div>
+
 </template>
 
 <script>
@@ -32,7 +33,7 @@ export default {
   data() {
     return {
       results: [],
-      isLoading: false,
+      isLoadingVms: false,
       searchInput: '',
       error: null,
       esnPattern : /^[0-9A-Fa-f]{8}$/,
@@ -41,9 +42,9 @@ export default {
   },
   methods: {
     loadDevice(si) {
-      this.searchInput = si;
       var url = "";
-      this.isLoading = true;
+      this.searchInput = si;
+      this.isLoadingVms = true;
       if (this.isEsn(this.searchInput)){
         url = "esn=" + this.searchInput;
       }
@@ -53,7 +54,7 @@ export default {
       else{
         // error handling
         this.error = "Not a valid MAC or ESN value!";
-        this.isLoading = false;
+        this.isLoadingVms = false;
         return;
       }
       axios.get(`http://localhost:9992/api/v2/CameraDirect/VmsRequest?active_brand=eagleeyenetworks.com&${url}`)
@@ -63,14 +64,32 @@ export default {
             return response.data;
           }
         }).then(data => {
-          this.isLoading = false;
+          this.isLoadingVms = false;
           const results = [];
           results.push(data.data);
           this.results = results;
         })
         .catch(error => {
           console.error(error);
-          this.isLoading = false;
+          this.isLoadingVms = false;
+          this.error = `Could not get device data, ${error.response.status} status code ${error.response.data.Message || error.response.data.message}`;
+        });
+
+      axios.get(`http://localhost:9992/api/v2/CameraDirect/GlobalDispatchInfo?${url}`)
+        .then(response => {
+          if (response.status === 200) {
+            this.error = null;
+            return response.data;
+          }
+        }).then(data => {
+          this.isLoadingVms = false;
+          const results = [];
+          results.push(data.data);
+          this.results = results;
+        })
+        .catch(error => {
+          console.error(error);
+          this.isLoadingVms = false;
           this.error = `Could not get device data, ${error.response.status} status code ${error.response.data.Message || error.response.data.message}`;
         });
 
