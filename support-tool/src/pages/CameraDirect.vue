@@ -5,34 +5,29 @@
       <input type="text" v-model="searchInput" placeholder="Enter ESN/ Mac Address">
       <button @click="loadDevice(searchInput)">Search</button>
     </div>
-    <p v-if="isLoading">Loading...</p>
-    <p v-else-if="!isLoading && error">{{ error }}</p>
-    <div v-else-if="results.length > 0">
-        <camera-direct-result
-          v-for="result in results"
-          :key="result.device_id"
-          :device="result.device_id"
-          :mac_address="result.mac_address"
-          :name="result.name"
-          :type="result.type"
-          :account="result.account"
-          :cluster="result.cluster"
-        ></camera-direct-result>
+    <div>
+    <cd-vms-result
+      :isLoading="isLoadingVms"
+      :error="error"
+      :results="results"
+    ></cd-vms-result>
     </div>
+
 </template>
 
 <script>
-import CameraDirectResult from './../components/CameraDirectResult.vue';
+import CdVmsResult from '../components/CameraDirectVmsResult.vue';
 import axios from 'axios';
 
 export default {
   components: {
-    CameraDirectResult,
+    CdVmsResult,
   },
   data() {
     return {
       results: [],
-      isLoading: false,
+      isLoadingVms: false,
+      searchInput: '',
       error: null,
       esnPattern : /^[0-9A-Fa-f]{8}$/,
       macAddressPattern : /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/
@@ -41,17 +36,18 @@ export default {
   methods: {
     loadDevice(si) {
       var url = "";
-      this.isLoading = true;
-      if (this.isEsn(si)){
-        url = "esn=" + si;
+      this.searchInput = si;
+      this.isLoadingVms = true;
+      if (this.isEsn(this.searchInput)){
+        url = "esn=" + this.searchInput;
       }
-      else if (this.isMac(si)) {
-        url = "mac_addr=" + encodeURIComponent(si);
+      else if (this.isMac(this.searchInput)) {
+        url = "mac_addr=" + encodeURIComponent(this.searchInput);
       }
       else{
         // error handling
         this.error = "Not a valid MAC or ESN value!";
-        this.isLoading = false;
+        this.isLoadingVms = false;
         return;
       }
       axios.get(`http://localhost:9992/api/v2/CameraDirect/VmsRequest?active_brand=eagleeyenetworks.com&${url}`)
@@ -61,14 +57,32 @@ export default {
             return response.data;
           }
         }).then(data => {
-          this.isLoading = false;
+          this.isLoadingVms = false;
           const results = [];
           results.push(data.data);
           this.results = results;
         })
         .catch(error => {
           console.error(error);
-          this.isLoading = false;
+          this.isLoadingVms = false;
+          this.error = `Could not get device data, ${error.response.status} status code ${error.response.data.Message || error.response.data.message}`;
+        });
+
+      axios.get(`http://localhost:9992/api/v2/CameraDirect/GlobalDispatchInfo?${url}`)
+        .then(response => {
+          if (response.status === 200) {
+            this.error = null;
+            return response.data;
+          }
+        }).then(data => {
+          this.isLoadingVms = false;
+          const results = [];
+          results.push(data.data);
+          this.results = results;
+        })
+        .catch(error => {
+          console.error(error);
+          this.isLoadingVms = false;
           this.error = `Could not get device data, ${error.response.status} status code ${error.response.data.Message || error.response.data.message}`;
         });
 
