@@ -9,14 +9,7 @@
     <cd-vms-result
       :isLoading="isLoadingVms"
       :error="error"
-      v-for="result in results"
-      :key="result.device_id"
-      :device="result.device_id"
-      :mac_address="result.mac_address"
-      :name="result.name"
-      :type="result.type"
-      :account="result.account"
-      :cluster="result.cluster"
+      :results="results"
     ></cd-vms-result>
     </div>
 

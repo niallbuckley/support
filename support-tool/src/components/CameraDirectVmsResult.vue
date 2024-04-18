@@ -1,40 +1,40 @@
 <template>
   <p v-if="isLoading">Loading...</p>
   <p v-else-if="!isLoading && error">{{ error }}</p>
-  <div v-else >
-  <table>
+  <div v-else-if="results.length > 0">
+  <table v-for="result in results" :key="result.device_id">
   <th colspan="2"> VMS Database </th>
   <tr>
     <td><strong>Device</strong></td>
-    <td>{{ device }}</td>
+    <td>{{ result.device_id }}</td>
   </tr>
   <tr>
     <td><strong>Name</strong></td>
-    <td>{{ name }}</td>
+    <td>{{ result.name }}</td>
   </tr>
   <tr>
     <td><strong>MAC Address</strong></td>
-    <td>{{ mac_address }}</td>
+    <td>{{ result.mac_address }}</td>
   </tr>
   <tr>
     <td><strong>Type</strong></td>
-    <td>{{ type }}</td>
+    <td>{{ result.type }}</td>
   </tr>
   <tr>
     <td><strong>Cluster</strong></td>
-    <td>{{ cluster }}</td>
+    <td>{{ result.cluster }}</td>
   </tr>
   <tr>
     <td><strong>Account</strong></td>
-    <td>{{ account }}</td>
+    <td>{{ result.account }}</td>
   </tr>
-  </table>
+  </table> 
   </div>
 </template>
 
 <script>
 export default {
-  props: ['device', 'name', 'mac_address', 'type', 'cluster', 'account', 'isLoading', 'error', 'searchInput', 'r']
+  props: ['isLoading', 'error', 'results']
 }
 
 </script>
