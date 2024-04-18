@@ -14,7 +14,7 @@
   </tr>
   <tr>
     <td><strong>Cluster Id</strong></td>
-    <td>{{ result.clusterId }}</td>
+    <td>{{ getCluster(result.clusterId) }}</td>
   </tr>
   </table> 
   </div>
@@ -22,9 +22,41 @@
 
 <script>
 export default {
-  props: ['isLoading', 'error', 'results']
+  props: ['isLoading', 'error', 'results'],
+  data() {
+    return {
+    };
+  },
+  
+  methods: {
+    getCluster(clusterId){
+      var clusterMap= {
+        "0": "aus1p1-c000",
+        "1": "aus1p1-c001",
+        "5": "aus1p2",
+        "12": "aus1p3",
+        "14": "aus1p4",
+        "15": "aus1p5",
+        "16": "aus1p7",
+        "17": "aus1p8",
+        "18": "aus1p9",
+        "20": "aus1p10",
+        "21": "aus1p11",
+        "23": "aus1p12",
+        "24": "aus1p13",
+        "26": "aus1p14",
+        "13": "fra1p1",
+        "22": "lon1p1",
+        "25": "yyz1p1",
+        "2": "test",
+        "55": "jtest",
+        "56": "stage"
+      }
+      
+      return clusterMap[clusterId];
+    }
+  }
 }
-
 </script>
 
 <style scoped>
