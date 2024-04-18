@@ -5,30 +5,30 @@
       <input type="text" v-model="searchInput" placeholder="Enter ESN/ Mac Address">
       <button @click="loadDevice(searchInput)">Search</button>
     </div>
-    <p v-if="isLoadingVms">Loading...</p>
-    <p v-else-if="!isLoadingVms && error">{{ error }}</p>
-    <div v-else-if="!isLoadingVms  && searchInput">
-        <camera-direct-result
-          v-for="result in results"
-          :key="result.device_id"
-          :device="result.device_id"
-          :mac_address="result.mac_address"
-          :name="result.name"
-          :type="result.type"
-          :account="result.account"
-          :cluster="result.cluster"
-        ></camera-direct-result>
+    <div>
+    <cd-vms-result
+      :isLoading="isLoadingVms"
+      :error="error"
+      v-for="result in results"
+      :key="result.device_id"
+      :device="result.device_id"
+      :mac_address="result.mac_address"
+      :name="result.name"
+      :type="result.type"
+      :account="result.account"
+      :cluster="result.cluster"
+    ></cd-vms-result>
     </div>
 
 </template>
 
 <script>
-import CameraDirectResult from './../components/CameraDirectResult.vue';
+import CdVmsResult from '../components/CameraDirectVmsResult.vue';
 import axios from 'axios';
 
 export default {
   components: {
-    CameraDirectResult,
+    CdVmsResult,
   },
   data() {
     return {

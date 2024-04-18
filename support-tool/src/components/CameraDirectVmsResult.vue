@@ -1,4 +1,7 @@
 <template>
+  <p v-if="isLoading">Loading...</p>
+  <p v-else-if="!isLoading && error">{{ error }}</p>
+  <div v-else >
   <table>
   <th colspan="2"> VMS Database </th>
   <tr>
@@ -26,11 +29,12 @@
     <td>{{ account }}</td>
   </tr>
   </table>
+  </div>
 </template>
 
 <script>
 export default {
-  props: ['device', 'name', 'mac_address', 'type', 'cluster', 'account']
+  props: ['device', 'name', 'mac_address', 'type', 'cluster', 'account', 'isLoading', 'error', 'searchInput', 'r']
 }
 
 </script>
