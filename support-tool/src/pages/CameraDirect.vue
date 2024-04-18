@@ -11,22 +11,32 @@
       :error="error"
       :results="results"
     ></cd-vms-result>
+    <cd-gdi-result
+      :isLoading="isLoadingGdi"
+      :error="errorGdi"
+      :results="resultsGdi"
+    ></cd-gdi-result>
     </div>
 
 </template>
 
 <script>
 import CdVmsResult from '../components/CameraDirectVmsResult.vue';
+import CdGdiResult from '../components/CameraDirectGdiResult.vue';
 import axios from 'axios';
 
 export default {
   components: {
     CdVmsResult,
+    CdGdiResult
   },
   data() {
     return {
       results: [],
       isLoadingVms: false,
+      resultsGdi: [],
+      isLoadingGdi: false,
+      errorGdi: null,
       searchInput: '',
       error: null,
       esnPattern : /^[0-9A-Fa-f]{8}$/,
@@ -38,6 +48,7 @@ export default {
       var url = "";
       this.searchInput = si;
       this.isLoadingVms = true;
+      this.isLoadingGdi = true;
       if (this.isEsn(this.searchInput)){
         url = "esn=" + this.searchInput;
       }
@@ -48,6 +59,7 @@ export default {
         // error handling
         this.error = "Not a valid MAC or ESN value!";
         this.isLoadingVms = false;
+        this.isLoadingGdi = false;
         return;
       }
       axios.get(`http://localhost:9992/api/v2/CameraDirect/VmsRequest?active_brand=eagleeyenetworks.com&${url}`)
@@ -71,19 +83,19 @@ export default {
       axios.get(`http://localhost:9992/api/v2/CameraDirect/GlobalDispatchInfo?${url}`)
         .then(response => {
           if (response.status === 200) {
-            this.error = null;
+            this.errorGdi = null;
             return response.data;
           }
         }).then(data => {
-          this.isLoadingVms = false;
-          const results = [];
-          results.push(data.data);
-          this.results = results;
+          this.isLoadingGdi = false;
+          const resultsGdi = [];
+          resultsGdi.push(data.data);
+          this.resultsGdi = resultsGdi;
         })
         .catch(error => {
           console.error(error);
-          this.isLoadingVms = false;
-          this.error = `Could not get device data, ${error.response.status} status code ${error.response.data.Message || error.response.data.message}`;
+          this.isLoadingGdi = false;
+          this.errorGdi = `Could not get device data, ${error.response.status} status code ${error.response.data.Message || error.response.data.message}`;
         });
 
     },
