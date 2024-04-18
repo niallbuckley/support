@@ -25,12 +25,7 @@ export default {
   props: ['isLoading', 'error', 'results'],
   data() {
     return {
-    };
-  },
-  
-  methods: {
-    getCluster(clusterId){
-      var clusterMap= {
+      clusterMap: {
         "0": "aus1p1-c000",
         "1": "aus1p1-c001",
         "5": "aus1p2",
@@ -52,8 +47,12 @@ export default {
         "55": "jtest",
         "56": "stage"
       }
-      
-      return clusterMap[clusterId];
+    };
+  },
+  
+  methods: {
+    getCluster(clusterId){
+      return this.clusterMap[clusterId];
     }
   }
 }
