@@ -51,6 +51,7 @@ export default {
     };
   },
   methods: {
+
     parseCameraInpect(camInfo){
       // using an array to preserve order.
       const filteredData = [];
@@ -59,7 +60,6 @@ export default {
           if (key === "cameraSessionInfo") {
             filteredData.push(["sessionId", camInfo.currentState[key].sessionId]);
             filteredData.push(["serviceId", camInfo.currentState[key].serviceId]);
-            console.log(filteredData)
             continue;
           }
           filteredData.push([key, camInfo.currentState[key]]);
@@ -72,9 +72,9 @@ export default {
           }
         }
       }
-      console.log("filtered: ", filteredData);
       this.resultsCameraInspect = filteredData;
     },
+
     callCameraInstance(macAddress, hostName, port){
       console.log("Call Cam Instance", macAddress, hostName, port);
       axios.get(`http://localhost:9992/api/v2/CameraDirect/CameraInstance?address=${encodeURIComponent(macAddress)}&cluster_host=${hostName}&port=${port}`)
@@ -95,6 +95,26 @@ export default {
       });
     },
 
+    callGlobalDispatch(macAddr) {
+      var url = "mac_addr=" + encodeURIComponent(macAddr);
+        axios.get(`http://localhost:9992/api/v2/CameraDirect/GlobalDispatchInfo?${url}`)
+          .then(response => {
+            if (response.status === 200) {
+              this.errorGdi = null;
+              return response.data;
+            }
+          }).then(data => {
+            this.isLoadingGdi = false;
+            const resultsGdi = [];
+            resultsGdi.push(data.data);
+            this.resultsGdi = resultsGdi;
+          })
+          .catch(error => {
+            console.error(error);
+            this.isLoadingGdi = false;
+            this.errorGdi = `Could not get device data, ${error.response.status} status code ${error.response.data.Message || error.response.data.message}`;
+          });
+      },
     loadDevice(si) {
       var url = "";
       this.searchInput = si;
@@ -114,6 +134,10 @@ export default {
         this.isLoadingGdi = false;
         return;
       }
+      if (this.macAddress) {
+        this.callGlobalDispatch(this.macAddress)
+      }
+      // Make request to VMS Database
       axios.get(`http://localhost:9992/api/v2/CameraDirect/VmsRequest?active_brand=eagleeyenetworks.com&${url}`)
         .then(response => {
           if (response.status === 200) {
@@ -125,33 +149,20 @@ export default {
           const results = [];
           results.push(data.data);
           this.results = results;
-          this.macAddress = data.data.mac_address;
-          // TODO: if macAddress exists (it was passed in) and macAddress does not equal this mac Address display warning.
+          if (!this.macAddress) {
+            this.macAddress = data.data.mac_address;
+            this.callGlobalDispatch(this.macAddress);
+          }
+          // TODO: else if macAddress exists (it was passed in) and macAddress does not equal this mac Address display warning.
         })
         .catch(error => {
           console.error(error);
           this.isLoadingVms = false;
           this.error = `Could not get device data, ${error.response.status} status code ${error.response.data.Message || error.response.data.message}`;
         });
-      axios.get(`http://localhost:9992/api/v2/CameraDirect/GlobalDispatchInfo?${url}`)
-        .then(response => {
-          if (response.status === 200) {
-            this.errorGdi = null;
-            return response.data;
-          }
-        }).then(data => {
-          this.isLoadingGdi = false;
-          const resultsGdi = [];
-          resultsGdi.push(data.data);
-          this.resultsGdi = resultsGdi;
-        })
-        .catch(error => {
-          console.error(error);
-          this.isLoadingGdi = false;
-          this.errorGdi = `Could not get device data, ${error.response.status} status code ${error.response.data.Message || error.response.data.message}`;
-        });
 
-        axios.get(`http://localhost:9992/api/v2/CameraDirect/EurekaInfo`)
+      // Make request to Eureka Info
+      axios.get(`http://localhost:9992/api/v2/CameraDirect/EurekaInfo`)
         .then(response => {
           if (response.status === 200) {
             //this.errorGdi = null;
