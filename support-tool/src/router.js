@@ -9,8 +9,7 @@ const router = createRouter({
     routes: [
         { path: '/', component: HomePage },
         { path: '/camera-direct', component: CameraDirect},
-        { path: '/user/:id', name: 'user', component: UserPage} 
-        //{ path: '/user', name: 'user', component: UserPage} 
+        { path: '/user/:id', name: 'user', component: UserPage}
     ]
 });
 

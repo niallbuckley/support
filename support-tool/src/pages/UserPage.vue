@@ -21,7 +21,6 @@ export default {
   },
   beforeMount() {
     const userId = this.$route.params.id;
-    // Now you can use the value of `userId` in your component
     this.userId = this.$route.params.id;
     console.log(userId);
   }
