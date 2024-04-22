@@ -1,7 +1,7 @@
 <template>
     <router-view></router-view>
     <h1> Users </h1>
-    <h2> {{ this.userId }}</h2>
+    <h2> {{ userId }}</h2>
     <div>
     </div>
 
@@ -14,10 +14,15 @@ export default {
       userId: ''
     }
   },
-  mounted() {
+  watch: {
+    '$route.params.id'(newId) {
+      this.userId = newId;
+    }
+  },
+  beforeMount() {
     const userId = this.$route.params.id;
     // Now you can use the value of `userId` in your component
-    this.userId = userId;
+    this.userId = this.$route.params.id;
     console.log(userId);
   }
 };
