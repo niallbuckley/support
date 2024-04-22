@@ -16,6 +16,9 @@
       :error="errorGdi"
       :results="resultsGdi"
     ></cd-gdi-result>
+    <cd-cam-inspect-result
+      :results="resultsCameraInspect"
+    ></cd-cam-inspect-result>
     </div>
 
 </template>
@@ -23,12 +26,14 @@
 <script>
 import CdVmsResult from '../components/CameraDirectVmsResult.vue';
 import CdGdiResult from '../components/CameraDirectGdiResult.vue';
+import CdCamInspectResult from '../components/CameraDirectInspectResult.vue';
 import axios from 'axios';
 
 export default {
   components: {
     CdVmsResult,
-    CdGdiResult
+    CdGdiResult,
+    CdCamInspectResult
   },
   data() {
     return {
@@ -41,10 +46,35 @@ export default {
       error: null,
       esnPattern : /^[0-9A-Fa-f]{8}$/,
       macAddressPattern : /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/,
-      macAddress: ''
+      macAddress: '',
+      resultsCameraInspect: []
     };
   },
   methods: {
+    parseCameraInpect(camInfo){
+      // using an array to preserve order.
+      const filteredData = [];
+      for (const key in camInfo.currentState) {
+        if (camInfo.currentState[key] !== "" && camInfo.currentState[key] !== null && camInfo.currentState[key] !== undefined) {
+          if (key === "cameraSessionInfo") {
+            filteredData.push(["sessionId", camInfo.currentState[key].sessionId]);
+            filteredData.push(["serviceId", camInfo.currentState[key].serviceId]);
+            console.log(filteredData)
+            continue;
+          }
+          filteredData.push([key, camInfo.currentState[key]]);
+        }
+      }
+      if (camInfo.lastAddAttemptInfo.deviceId !== 0) {
+        for (const key in camInfo.lastAddAttemptInfo) {
+          if (camInfo.lastAddAttemptInfo[key] !== "" && camInfo.lastAddAttemptInfo[key] !== null && camInfo.lastAddAttemptInfo[key] !== undefined) {
+            filteredData.push([key, camInfo.lastAddAttemptInfo[key]]);
+          }
+        }
+      }
+      console.log("filtered: ", filteredData);
+      this.resultsCameraInspect = filteredData;
+    },
     callCameraInstance(macAddress, hostName, port){
       console.log("Call Cam Instance", macAddress, hostName, port);
       axios.get(`http://localhost:9992/api/v2/CameraDirect/CameraInstance?address=${encodeURIComponent(macAddress)}&cluster_host=${hostName}&port=${port}`)
@@ -54,9 +84,10 @@ export default {
             return response.data;
           }
         }).then(data => {
-          if (data.data.currentState.added===true || data.data.lastAddAttemptInfo.deviceId !== 0 ){
+          if (data.data.currentState.added === true || data.data.lastAddAttemptInfo.deviceId !== 0 ){
             console.log("ds", data.data);
             //display the data.
+            this.parseCameraInpect(data.data);
           }
         })
         .catch(error => {
