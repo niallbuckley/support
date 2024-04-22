@@ -114,12 +114,14 @@ export default {
             this.isLoadingGdi = false;
             this.errorGdi = `Could not get device data, ${error.response.status} status code ${error.response.data.Message || error.response.data.message}`;
           });
-      },
+    },
     loadDevice(si) {
       var url = "";
       this.searchInput = si;
       this.isLoadingVms = true;
       this.isLoadingGdi = true;
+
+      // Check format of search input, determine if it is an ESN or MAC addt
       if (this.isEsn(this.searchInput)){
         url = "esn=" + this.searchInput;
       }
@@ -134,9 +136,11 @@ export default {
         this.isLoadingGdi = false;
         return;
       }
+      // If MAC addr is already given we don't have to wait for VMS response
       if (this.macAddress) {
         this.callGlobalDispatch(this.macAddress)
       }
+
       // Make request to VMS Database
       axios.get(`http://localhost:9992/api/v2/CameraDirect/VmsRequest?active_brand=eagleeyenetworks.com&${url}`)
         .then(response => {
