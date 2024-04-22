@@ -1,10 +1,7 @@
 <template>
     <router-view></router-view>
     <h1> Users </h1>
-    <div>
-      <input type="text" v-model="searchInput" placeholder="Enter ESN/ Mac Address">
-      <button @click="loadDevice(searchInput)">Search</button>
-    </div>
+    <h2> {{ this.userId }}</h2>
     <div>
     </div>
 
@@ -12,9 +9,15 @@
 
 <script>
 export default {
+  data() {
+    return {
+      userId: ''
+    }
+  },
   mounted() {
     const userId = this.$route.params.id;
     // Now you can use the value of `userId` in your component
+    this.userId = userId;
     console.log(userId);
   }
 };
