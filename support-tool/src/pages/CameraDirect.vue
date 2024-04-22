@@ -16,6 +16,9 @@
       :error="errorGdi"
       :results="resultsGdi"
     ></cd-gdi-result>
+    <cd-cam-inspect-result
+      :results="resultsCameraInspect"
+    ></cd-cam-inspect-result>
     </div>
 
 </template>
@@ -23,12 +26,14 @@
 <script>
 import CdVmsResult from '../components/CameraDirectVmsResult.vue';
 import CdGdiResult from '../components/CameraDirectGdiResult.vue';
+import CdCamInspectResult from '../components/CameraDirectInspectResult.vue';
 import axios from 'axios';
 
 export default {
   components: {
     CdVmsResult,
-    CdGdiResult
+    CdGdiResult,
+    CdCamInspectResult
   },
   data() {
     return {
@@ -40,10 +45,56 @@ export default {
       searchInput: '',
       error: null,
       esnPattern : /^[0-9A-Fa-f]{8}$/,
-      macAddressPattern : /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/
+      macAddressPattern : /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/,
+      macAddress: '',
+      resultsCameraInspect: []
     };
   },
   methods: {
+    parseCameraInpect(camInfo){
+      // using an array to preserve order.
+      const filteredData = [];
+      for (const key in camInfo.currentState) {
+        if (camInfo.currentState[key] !== "" && camInfo.currentState[key] !== null && camInfo.currentState[key] !== undefined) {
+          if (key === "cameraSessionInfo") {
+            filteredData.push(["sessionId", camInfo.currentState[key].sessionId]);
+            filteredData.push(["serviceId", camInfo.currentState[key].serviceId]);
+            console.log(filteredData)
+            continue;
+          }
+          filteredData.push([key, camInfo.currentState[key]]);
+        }
+      }
+      if (camInfo.lastAddAttemptInfo.deviceId !== 0) {
+        for (const key in camInfo.lastAddAttemptInfo) {
+          if (camInfo.lastAddAttemptInfo[key] !== "" && camInfo.lastAddAttemptInfo[key] !== null && camInfo.lastAddAttemptInfo[key] !== undefined) {
+            filteredData.push([key, camInfo.lastAddAttemptInfo[key]]);
+          }
+        }
+      }
+      console.log("filtered: ", filteredData);
+      this.resultsCameraInspect = filteredData;
+    },
+    callCameraInstance(macAddress, hostName, port){
+      console.log("Call Cam Instance", macAddress, hostName, port);
+      axios.get(`http://localhost:9992/api/v2/CameraDirect/CameraInstance?address=${encodeURIComponent(macAddress)}&cluster_host=${hostName}&port=${port}`)
+        .then(response => {
+          if (response.status === 200) {
+            //this.errorGdi = null;
+            return response.data;
+          }
+        }).then(data => {
+          if (data.data.currentState.added === true || data.data.lastAddAttemptInfo.deviceId !== 0 ){
+            console.log("ds", data.data);
+            //display the data.
+            this.parseCameraInpect(data.data);
+          }
+        })
+        .catch(error => {
+          console.error(error);
+      });
+    },
+
     loadDevice(si) {
       var url = "";
       this.searchInput = si;
@@ -53,7 +104,8 @@ export default {
         url = "esn=" + this.searchInput;
       }
       else if (this.isMac(this.searchInput)) {
-        url = "mac_addr=" + encodeURIComponent(this.searchInput);
+        this.macAddress = this.searchInput;
+        url = "mac_addr=" + encodeURIComponent(this.macAddress);
       }
       else{
         // error handling
@@ -73,13 +125,14 @@ export default {
           const results = [];
           results.push(data.data);
           this.results = results;
+          this.macAddress = data.data.mac_address;
+          // TODO: if macAddress exists (it was passed in) and macAddress does not equal this mac Address display warning.
         })
         .catch(error => {
           console.error(error);
           this.isLoadingVms = false;
           this.error = `Could not get device data, ${error.response.status} status code ${error.response.data.Message || error.response.data.message}`;
         });
-
       axios.get(`http://localhost:9992/api/v2/CameraDirect/GlobalDispatchInfo?${url}`)
         .then(response => {
           if (response.status === 200) {
@@ -98,6 +151,20 @@ export default {
           this.errorGdi = `Could not get device data, ${error.response.status} status code ${error.response.data.Message || error.response.data.message}`;
         });
 
+        axios.get(`http://localhost:9992/api/v2/CameraDirect/EurekaInfo`)
+        .then(response => {
+          if (response.status === 200) {
+            //this.errorGdi = null;
+            return response.data;
+          }
+        }).then(data => {
+          for (const cluster of data.data){
+            this.callCameraInstance(this.macAddress, cluster.hostName, cluster.port);
+          }
+        })
+        .catch(error => {
+          console.error(error);
+        });
     },
 
     isEsn(identifier) {
