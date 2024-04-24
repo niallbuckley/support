@@ -17,6 +17,8 @@
       :results="resultsGdi"
     ></cd-gdi-result>
     <cd-cam-inspect-result
+      :isLoading="isLoadingCamI"
+      :error="errorCamI"
       :results="resultsCameraInspect"
     ></cd-cam-inspect-result>
     </div>
@@ -42,12 +44,14 @@ export default {
       resultsGdi: [],
       isLoadingGdi: false,
       errorGdi: null,
+      resultsCameraInspect: [],
+      isLoadingCamI: false,
+      errorCamI: null,
       searchInput: '',
       error: null,
       esnPattern : /^[0-9A-Fa-f]{8}$/,
       macAddressPattern : /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/,
-      macAddress: '',
-      resultsCameraInspect: []
+      macAddress: ''
     };
   },
   methods: {
@@ -79,8 +83,9 @@ export default {
       console.log("Call Cam Instance", macAddress, hostName, port);
       axios.get(`http://localhost:9992/api/v2/CameraDirect/CameraInstance?address=${encodeURIComponent(macAddress)}&cluster_host=${hostName}&port=${port}`)
         .then(response => {
+          this.isLoadingCamI = false;
           if (response.status === 200) {
-            //this.errorGdi = null;
+            this.errorCamI = null;
             return response.data;
           }
         }).then(data => {
@@ -91,7 +96,9 @@ export default {
           }
         })
         .catch(error => {
+          this.isLoadingCamI = false;
           console.error(error);
+          this.errorCamI = `Could not get camera instance data, ${error.response.status} status code ${error.response.data.Message || error.response.data.message}`;
       });
     },
 
@@ -120,6 +127,7 @@ export default {
       this.searchInput = si;
       this.isLoadingVms = true;
       this.isLoadingGdi = true;
+      this.isLoadingCamI = true;
 
       // Check format of search input, determine if it is an ESN or MAC addt
       if (this.isEsn(this.searchInput)){
@@ -134,6 +142,7 @@ export default {
         this.error = "Not a valid MAC or ESN value!";
         this.isLoadingVms = false;
         this.isLoadingGdi = false;
+        this.isLoadingCamI = false;
         return;
       }
       // If MAC addr is already given we don't have to wait for VMS response
