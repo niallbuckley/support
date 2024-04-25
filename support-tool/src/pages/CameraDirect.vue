@@ -16,11 +16,11 @@
       :error="errorGdi"
       :results="resultsGdi"
     ></cd-gdi-result>
-    <cd-cam-inspect-result
+    <cd-cam-instance-result
       :isLoading="isLoadingCamI"
       :error="errorCamI"
-      :results="resultsCameraInspect"
-    ></cd-cam-inspect-result>
+      :results="resultsCameraInstance"
+    ></cd-cam-instance-result>
     </div>
 
 </template>
@@ -28,14 +28,14 @@
 <script>
 import CdVmsResult from '../components/CameraDirectVmsResult.vue';
 import CdGdiResult from '../components/CameraDirectGdiResult.vue';
-import CdCamInspectResult from '../components/CameraDirectInspectResult.vue';
+import CdCamInstanceResult from '../components/CameraDirectInstanceResult.vue';
 import axios from 'axios';
 
 export default {
   components: {
     CdVmsResult,
     CdGdiResult,
-    CdCamInspectResult
+    CdCamInstanceResult
   },
   data() {
     return {
@@ -44,7 +44,7 @@ export default {
       resultsGdi: [],
       isLoadingGdi: false,
       errorGdi: null,
-      resultsCameraInspect: [],
+      resultsCameraInstance: [],
       isLoadingCamI: false,
       errorCamI: null,
       searchInput: '',
@@ -76,7 +76,7 @@ export default {
           }
         }
       }
-      this.resultsCameraInspect = filteredData;
+      this.resultsCameraInstance = filteredData;
     },
 
     callCameraInstance(macAddress, hostName, port){

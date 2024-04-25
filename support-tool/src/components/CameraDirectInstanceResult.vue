@@ -3,7 +3,7 @@
   <p v-else-if="!isLoading && error">{{ error }}</p>
   <div v-else-if="results.length > 0">
   <table>
-  <th colspan="2"> Camera Inspect </th>
+  <th colspan="2"> Camera Instance </th>
   <tr v-for="(tuple, index) in results" :key="index">
     <td><strong>{{ tuple[0] }}</strong></td>
     <td>{{ tuple[1] }}</td>
