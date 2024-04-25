@@ -178,7 +178,6 @@ export default {
       axios.get(`http://localhost:9992/api/v2/CameraDirect/EurekaInfo`)
         .then(response => {
           if (response.status === 200) {
-            //this.errorGdi = null;
             return response.data;
           }
         }).then(data => {
@@ -188,6 +187,8 @@ export default {
         })
         .catch(error => {
           console.error(error);
+          this.isLoadingCamI = false;
+          this.errorCamI = `Could not get eureka information, ${error.response.status} status code ${error.response.data.Message || error.response.data.message}`;
         });
     },
 
