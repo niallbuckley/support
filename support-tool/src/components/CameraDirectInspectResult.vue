@@ -1,7 +1,7 @@
 <template>
-  <!-- <p v-if="isLoading">Loading...</p>
-  <p v-else-if="!isLoading && error">{{ error }}</p> -->
-  <div v-if="results.length > 0">
+  <p v-if="isLoading">Loading...</p>
+  <p v-else-if="!isLoading && error">{{ error }}</p>
+  <div v-else-if="results.length > 0">
   <table>
   <th colspan="2"> Camera Inspect </th>
   <tr v-for="(tuple, index) in results" :key="index">
@@ -14,7 +14,7 @@
 
 <script>
 export default {
-  props: ['results']
+  props: ['isLoading', 'error', 'results']
 }
 
 </script>

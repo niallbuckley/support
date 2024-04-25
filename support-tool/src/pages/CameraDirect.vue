@@ -17,6 +17,8 @@
       :results="resultsGdi"
     ></cd-gdi-result>
     <cd-cam-inspect-result
+      :isLoading="isLoadingCamI"
+      :error="errorCamI"
       :results="resultsCameraInspect"
     ></cd-cam-inspect-result>
     </div>
@@ -42,15 +44,18 @@ export default {
       resultsGdi: [],
       isLoadingGdi: false,
       errorGdi: null,
+      resultsCameraInspect: [],
+      isLoadingCamI: false,
+      errorCamI: null,
       searchInput: '',
       error: null,
       esnPattern : /^[0-9A-Fa-f]{8}$/,
       macAddressPattern : /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/,
-      macAddress: '',
-      resultsCameraInspect: []
+      macAddress: ''
     };
   },
   methods: {
+
     parseCameraInpect(camInfo){
       // using an array to preserve order.
       const filteredData = [];
@@ -59,7 +64,6 @@ export default {
           if (key === "cameraSessionInfo") {
             filteredData.push(["sessionId", camInfo.currentState[key].sessionId]);
             filteredData.push(["serviceId", camInfo.currentState[key].serviceId]);
-            console.log(filteredData)
             continue;
           }
           filteredData.push([key, camInfo.currentState[key]]);
@@ -72,15 +76,16 @@ export default {
           }
         }
       }
-      console.log("filtered: ", filteredData);
       this.resultsCameraInspect = filteredData;
     },
+
     callCameraInstance(macAddress, hostName, port){
       console.log("Call Cam Instance", macAddress, hostName, port);
       axios.get(`http://localhost:9992/api/v2/CameraDirect/CameraInstance?address=${encodeURIComponent(macAddress)}&cluster_host=${hostName}&port=${port}`)
         .then(response => {
+          this.isLoadingCamI = false;
           if (response.status === 200) {
-            //this.errorGdi = null;
+            this.errorCamI = null;
             return response.data;
           }
         }).then(data => {
@@ -91,15 +96,40 @@ export default {
           }
         })
         .catch(error => {
+          this.isLoadingCamI = false;
           console.error(error);
+          this.errorCamI = `Could not get camera instance data, ${error.response.status} status code ${error.response.data.Message || error.response.data.message}`;
       });
     },
 
+    callGlobalDispatch(macAddr) {
+      var url = "mac_addr=" + encodeURIComponent(macAddr);
+        axios.get(`http://localhost:9992/api/v2/CameraDirect/GlobalDispatchInfo?${url}`)
+          .then(response => {
+            if (response.status === 200) {
+              this.errorGdi = null;
+              return response.data;
+            }
+          }).then(data => {
+            this.isLoadingGdi = false;
+            const resultsGdi = [];
+            resultsGdi.push(data.data);
+            this.resultsGdi = resultsGdi;
+          })
+          .catch(error => {
+            console.error(error);
+            this.isLoadingGdi = false;
+            this.errorGdi = `Could not get device data, ${error.response.status} status code ${error.response.data.Message || error.response.data.message}`;
+          });
+    },
     loadDevice(si) {
       var url = "";
       this.searchInput = si;
       this.isLoadingVms = true;
       this.isLoadingGdi = true;
+      this.isLoadingCamI = true;
+
+      // Check format of search input, determine if it is an ESN or MAC addt
       if (this.isEsn(this.searchInput)){
         url = "esn=" + this.searchInput;
       }
@@ -112,8 +142,15 @@ export default {
         this.error = "Not a valid MAC or ESN value!";
         this.isLoadingVms = false;
         this.isLoadingGdi = false;
+        this.isLoadingCamI = false;
         return;
       }
+      // If MAC addr is already given we don't have to wait for VMS response
+      if (this.macAddress) {
+        this.callGlobalDispatch(this.macAddress)
+      }
+
+      // Make request to VMS Database
       axios.get(`http://localhost:9992/api/v2/CameraDirect/VmsRequest?active_brand=eagleeyenetworks.com&${url}`)
         .then(response => {
           if (response.status === 200) {
@@ -125,36 +162,22 @@ export default {
           const results = [];
           results.push(data.data);
           this.results = results;
-          this.macAddress = data.data.mac_address;
-          // TODO: if macAddress exists (it was passed in) and macAddress does not equal this mac Address display warning.
+          if (!this.macAddress) {
+            this.macAddress = data.data.mac_address;
+            this.callGlobalDispatch(this.macAddress);
+          }
+          // TODO: else if macAddress exists (it was passed in) and macAddress does not equal this mac Address display warning.
         })
         .catch(error => {
           console.error(error);
           this.isLoadingVms = false;
           this.error = `Could not get device data, ${error.response.status} status code ${error.response.data.Message || error.response.data.message}`;
         });
-      axios.get(`http://localhost:9992/api/v2/CameraDirect/GlobalDispatchInfo?${url}`)
-        .then(response => {
-          if (response.status === 200) {
-            this.errorGdi = null;
-            return response.data;
-          }
-        }).then(data => {
-          this.isLoadingGdi = false;
-          const resultsGdi = [];
-          resultsGdi.push(data.data);
-          this.resultsGdi = resultsGdi;
-        })
-        .catch(error => {
-          console.error(error);
-          this.isLoadingGdi = false;
-          this.errorGdi = `Could not get device data, ${error.response.status} status code ${error.response.data.Message || error.response.data.message}`;
-        });
 
-        axios.get(`http://localhost:9992/api/v2/CameraDirect/EurekaInfo`)
+      // Make request to Eureka Info
+      axios.get(`http://localhost:9992/api/v2/CameraDirect/EurekaInfo`)
         .then(response => {
           if (response.status === 200) {
-            //this.errorGdi = null;
             return response.data;
           }
         }).then(data => {
@@ -164,6 +187,8 @@ export default {
         })
         .catch(error => {
           console.error(error);
+          this.isLoadingCamI = false;
+          this.errorCamI = `Could not get eureka information, ${error.response.status} status code ${error.response.data.Message || error.response.data.message}`;
         });
     },
 
