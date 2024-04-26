@@ -3,10 +3,10 @@
   <p v-else-if="!isLoading && error">{{ error }}</p>
   <div v-else-if="results.length > 0">
   <table>
-  <th colspan="2"> Camera Instance </th>
+  <th colspan="2" style="text-align: center;"> Camera Instance </th>
   <tr v-for="(tuple, index) in results" :key="index">
-    <td><strong>{{ tuple[0] }}</strong></td>
-    <td>{{ tuple[1] }}</td>
+    <td style="text-align: center;"><strong>{{ tuple[0] }}</strong></td>
+    <td style="text-align: center;">{{ tuple[1] }}</td>
   </tr>
   </table> 
   </div>
@@ -19,7 +19,8 @@ export default {
 
 </script>
 
-<style scoped>
+<style>
+
 table {
   width: 100%; /* Make the table fill the webpage width */
   border-collapse: collapse;
@@ -42,14 +43,17 @@ th {
   padding: 8px;
 }
 
+
 /* Apply alternate background color to even rows */
 tr:nth-child(even) {
   background-color: #f9f9f9; /* Lighter gray background for even rows */
 }
-th, td {
+
+tr, td {
   text-align: center;
-  vertical-align: middle;
+  /* vertical-align: middle; */
 } 
+
 
 </style>
 
