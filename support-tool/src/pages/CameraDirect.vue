@@ -55,20 +55,24 @@ export default {
     };
   },
   methods: {
-
+    camelCaseToReadable(camelCaseString) {
+      return camelCaseString.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase());
+    },
     parseCameraInpect(camInfo){
       // using an array to preserve order.
       const filteredData = [];
       for (const key in camInfo.currentState) {
         if (camInfo.currentState[key] !== "" && camInfo.currentState[key] !== null && camInfo.currentState[key] !== undefined) {
           if (key === "cameraSessionInfo") {
-            filteredData.push(["sessionId", camInfo.currentState[key].sessionId]);
-            filteredData.push(["serviceId", camInfo.currentState[key].serviceId]);
+            filteredData.push(["Session Id", camInfo.currentState[key].sessionId]);
+            filteredData.push(["Service Id", camInfo.currentState[key].serviceId]);
             continue;
           }
-          filteredData.push([key, camInfo.currentState[key]]);
+          this.isLoadingCamI = false;
+          filteredData.push([this.camelCaseToReadable(key), camInfo.currentState[key]]);
         }
       }
+      // This condition is only met if the device has been added in the last 6 months 
       if (camInfo.lastAddAttemptInfo.deviceId !== 0) {
         for (const key in camInfo.lastAddAttemptInfo) {
           if (camInfo.lastAddAttemptInfo[key] !== "" && camInfo.lastAddAttemptInfo[key] !== null && camInfo.lastAddAttemptInfo[key] !== undefined) {
@@ -80,10 +84,8 @@ export default {
     },
 
     callCameraInstance(macAddress, hostName, port){
-      console.log("Call Cam Instance", macAddress, hostName, port);
       axios.get(`http://localhost:9992/api/v2/CameraDirect/CameraInstance?address=${encodeURIComponent(macAddress)}&cluster_host=${hostName}&port=${port}`)
         .then(response => {
-          this.isLoadingCamI = false;
           if (response.status === 200) {
             this.errorCamI = null;
             return response.data;
@@ -203,34 +205,3 @@ export default {
 
 };
 </script>
-
-  <style scoped>
-  li {
-    margin: 1rem 0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
-    border-radius: 12px;
-    padding: 1rem;
-  }
-  
-  li h3 {
-    margin: 0.5rem 0;
-    font-size: 1.25rem;
-  }
-  
-  li .team-members {
-    margin: 0.5rem 0;
-  }
-  
-  a {
-    text-decoration: none;
-    color: white;
-    display: inline-block;
-    padding: 0.5rem 1.5rem;
-    background-color: #11005c;
-  }
-  
-  a:hover,
-  a:active {
-    background-color: #220a8d;
-  }
-  </style>
