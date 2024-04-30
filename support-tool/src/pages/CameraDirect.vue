@@ -25,6 +25,31 @@
 
 </template>
 
+<style scoped>
+input[type="text"] {
+    padding: 10px;
+    width: 200px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 10px;
+  }
+
+
+button {
+    padding: 10px 20px;
+    background-color: #fda117; /* Blue color, you can change it */
+    color: #160101; /* Text color */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  /* Hover effect for button */
+button:hover {
+    background-color: #bd7203; /* Darker blue color */
+  }
+</style>
+
 <script>
 import CdVmsResult from '../components/CameraDirectVmsResult.vue';
 import CdGdiResult from '../components/CameraDirectGdiResult.vue';
