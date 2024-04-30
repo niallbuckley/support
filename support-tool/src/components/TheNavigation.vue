@@ -30,5 +30,7 @@ a.active {
 }
 
 
+
+
 @import '/src/assets/css/bulma.min.css'
 </style>
