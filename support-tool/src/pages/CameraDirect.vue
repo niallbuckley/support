@@ -25,7 +25,7 @@
 
 </template>
 
-<style scoped>
+<style>
 input[type="text"] {
     padding: 10px;
     width: 200px;
@@ -37,8 +37,8 @@ input[type="text"] {
 
 button {
     padding: 10px 20px;
-    background-color: #fda117; /* Blue color, you can change it */
-    color: #160101; /* Text color */
+    background-color: #fda117; 
+    color: #160101;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -46,7 +46,7 @@ button {
 
   /* Hover effect for button */
 button:hover {
-    background-color: #bd7203; /* Darker blue color */
+    background-color: #bd7203;
   }
 </style>
 
