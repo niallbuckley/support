@@ -14,7 +14,7 @@
 
 <script>
 import axios from 'axios';
-import AccountVmsResult from '../components/UserVmsResult.vue';
+import AccountVmsResult from '../components/AccountVmsResult.vue';
 
 export default {
   components: {
