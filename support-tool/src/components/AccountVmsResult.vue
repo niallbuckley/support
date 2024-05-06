@@ -9,6 +9,10 @@
     <td>{{ result.account_id }}</td>
   </tr>
   <tr>
+    <td><strong>Parent</strong></td>
+    <td>{{ result.parent_account_id }}</td>
+  </tr>
+  <tr>
     <td><strong>Name</strong></td>
     <td><strong>{{ result.name }}</strong></td>
   </tr>
@@ -18,11 +22,23 @@
   </tr>
   <tr>
     <td><strong>Status</strong></td>
-    <td>{{ result.status }}</td>
+    <td>{{ result.status[0] }}</td>
   </tr>
   <tr>
-    <td><strong>feature flags</strong></td>
-    <td>{{ result.feature_flags }}</td>
+    <td><strong>feature flags ({{ result.feature_flags.length }})</strong></td>
+    <td>
+      <span v-for="(flag, index) in result.feature_flags" :key="index">
+        {{ flag.trim() }}<span v-if="index !== result.feature_flags.length - 1">, </span>
+      </span>
+    </td>
+  </tr>
+  <tr>
+    <td><strong>Created</strong></td>
+    <td>{{ result.create_timestamp }}</td>
+  </tr>
+  <tr>
+    <td><strong>SW Group</strong></td>
+    <td>{{ result.software_group }}</td>
   </tr>
   </table> 
   </div>
