@@ -25,9 +25,9 @@
     <td>{{ result.status[0] }}</td>
   </tr>
   <tr>
-    <td><strong>feature flags ({{ result.feature_flags.length }})</strong></td>
+    <td><strong>Feature Flags ({{ result.feature_flags.length }})</strong></td>
     <td>
-      <span v-for="(flag, index) in result.feature_flags" :key="index">
+      <span v-for="(flag, index) in result.feature_flags" :key="index"> 
         {{ flag.trim() }}<span v-if="index !== result.feature_flags.length - 1">, </span>
       </span>
     </td>
