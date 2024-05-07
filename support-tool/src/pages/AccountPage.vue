@@ -18,6 +18,11 @@
       :error="errorUser"
       :results="userResults"
     ></user-vms-result>
+    <device-result
+      :isLoading="isLoadingDevice"
+      :error="errorDevice"
+      :results="deviceResults"
+    ></device-result>
   </div>
 </template>
 
@@ -26,12 +31,14 @@ import axios from 'axios';
 import AccountVmsResult from '../components/account/AccountVmsResult.vue';
 import UserVmsResult from '../components/account/UserVmsResult.vue';
 import SubAccountResult from '../components/account/SubAccountResult.vue';
+import DeviceResult from '../components/account/DeviceResult.vue';
 
 export default {
   components: {
     AccountVmsResult,
     UserVmsResult,
-    SubAccountResult
+    SubAccountResult,
+    DeviceResult
   },
   data() {
     return {
@@ -47,7 +54,11 @@ export default {
       // sub-account component
       isLoadingSubAccount: false,
       errorSubAccount: false,
-      subAccountResults: []
+      subAccountResults: [],
+      // device component
+      isLoadingDevice: false,
+      errorDevice: false,
+      deviceResults: []
     }
   },
   methods: {
@@ -134,7 +145,39 @@ export default {
         .catch(error => {
           console.error(error);
           this.isLoadingSubAccount = false;
-          this.errorSubAccount = `Error while processing sub account for ${this.accountId}`;
+          this.errorSubAccount = `Error while processing sub account(s) for ${this.accountId}`;
+        });
+    },
+    getDeviceInfo(){
+      axios.get(`http://localhost:9992/api/v2/Account/${this.accountId}/Devices`)
+      .then(response => {
+          if (response.status === 200) {
+            this.errorDevice = null;
+            return response.data;
+          }
+        }).then(data => {
+          this.isLoadingDevice = false;
+          const results = [];
+          if (data.data.length >= 1){
+            for (var i=0; i < data.data.length; i++) {
+              var device = data.data[i]
+              // accounts are included in Device call - backend bug?
+              if (device.type == "account"){
+                continue
+              }
+              results.push(device);
+            }
+            this.deviceResults = results;
+          }
+          else{
+            // No devices
+            this.errorDevice= ``
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          this.isLoadingDevice = false;
+          this.errorDevice = `Error while processing device(s) for ${this.accountId}`;
         });
     },
     displayAccountInfo(){
@@ -144,12 +187,12 @@ export default {
       this.getAccountInfo();
       this.getUserInfo();
       this.getSubAccountInfo();
+      this.getDeviceInfo();
     }
   },
   watch: {
     '$route.params.id'(newId) {
       this.accountId = newId;
-      console.log("here");
       this.displayAccountInfo();
     }
   },

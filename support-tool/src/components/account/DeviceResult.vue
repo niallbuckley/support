@@ -2,24 +2,33 @@
   <p v-if="isLoading">Loading...</p>
   <p v-else-if="!isLoading && error">{{ error }}</p>
   <div v-else-if="results.length > 0">
-    <h1> Users </h1>
+    <h1> Devices </h1>
     <table>
       <thead>
       <tr>
-        <th><strong>Email</strong></th>
-        <th><strong>Account Id</strong></th>
-        <th><strong>User Id</strong></th>
         <th><strong>Name</strong></th>
-        <th><strong>Parent</strong></th>
+        <th><strong>Type</strong></th>
+        <th><strong>Cluster</strong></th>
+        <th><strong>ESN</strong></th>
+        <th><strong>Serial #</strong></th>
+        <th><strong>Make/ Model</strong></th>
+        <th><strong>Archivers</strong></th>
       </tr>
       </thead>
-      <tbody v-for="result in results" :key="result.account_id">
+      <tbody v-for="result in results" :key="result.device_id">
         <tr>
-          <td>{{ result.email }}</td>
-          <td>{{ result.account_id }}</td>
-          <td>{{ result.user_id }}</td>
-          <td>{{ result.first_name }} {{ result.last_name }}</td>
-          <td>{{ result.parent_account_id }}</td>
+          <td>{{ result.name }}</td>
+          <td>{{ result.type }}</td>
+          <td>{{ result.cluster }}</td>
+          <td>{{ result.device_id }}</td>
+          <td>{{ result.mac_address }}</td>
+          <td>{{ result.make }} {{ result.model }} {{ result.hardware_version }}</td>
+          <td>
+            <span v-for="(arch, index) in result.archivers" :key="index">
+              {{ arch.trim() }}<span v-if="index !== result.archivers.length - 1">, 
+            </span>
+          </span>
+          </td>
         </tr>
       </tbody>
     </table> 
@@ -61,5 +70,3 @@ th, td {
 } 
 
 </style>
-
-
