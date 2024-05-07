@@ -88,16 +88,13 @@ export default {
             return response.data;
           }
         }).then(data => {
-          console.log("Users", data.data);
           this.isLoadingUser = false;
           const results = [];
           // This is a backend bug the Info endpoint will always return data even if the user id is not real
           if (data.data[0].account_id !== ''){
             for (var i=0; i < data.data.length; i++) {
               var user = data.data[i]
-              console.log("user: ", user);
               results.push(user);
-              console.log(this.userResults);
             }
             this.userResults = results;
           }
@@ -112,7 +109,7 @@ export default {
         });
     },
     getSubAccountInfo(){
-      // Get user info from VMS
+      // Get sub account info from VMS
       axios.get(`http://localhost:9992/api/v2/Account/${this.accountId}/SubAccounts`)
       .then(response => {
           if (response.status === 200) {
@@ -120,34 +117,30 @@ export default {
             return response.data;
           }
         }).then(data => {
-          console.log("Sub Accounts", data.data);
           this.isLoadingSubAccount = false;
           const results = [];
-          // This is a backend bug the Info endpoint will always return data even if the user id is not real
-          if (data.data[0].account_id !== ''){
+          if (data.data.length >= 1){
             for (var i=0; i < data.data.length; i++) {
-              var user = data.data[i]
-              console.log("user: ", user);
-              results.push(user);
-              console.log(this.subAccountResults);
+              var sub = data.data[i]
+              results.push(sub);
             }
             this.subAccountResults = results;
           }
           else{
-            this.error = `The user id ${this.accountId} does not exist in vms database`
+            // No sub-accounts
+            this.errorSubAccount = ``
           }
         })
         .catch(error => {
           console.error(error);
           this.isLoadingSubAccount = false;
-          this.errorSubAccount = `Could not get account user data, ${error.response.status} status code ${error.response.data.Message || error.response.data.message}`;
+          this.errorSubAccount = `Error while processing sub account for ${this.accountId}`;
         });
     },
     displayAccountInfo(){
       this.isLoadingVms = true;
       this.isLoadingUser = true;
       this.isLoadingSubAccount = true;
-      console.log("hello", this.accountId);
       this.getAccountInfo();
       this.getUserInfo();
       this.getSubAccountInfo();
