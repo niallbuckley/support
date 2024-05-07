@@ -1,8 +1,8 @@
 <template>
-    <router-view></router-view>
-    <h1> Account </h1>
-    <h2> {{ accountId }}</h2>
-    <div>
+  <router-view></router-view>
+  <h1> Account </h1>
+  <h2> {{ accountId }}</h2>
+  <div>
     <account-vms-result
       :isLoading="isLoadingVms"
       :error="error"
@@ -13,8 +13,7 @@
       :error="errorUser"
       :results="userResults"
     ></user-vms-result>
-    </div>
-
+  </div>
 </template>
 
 <script>

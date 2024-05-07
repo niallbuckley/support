@@ -8,6 +8,7 @@
       <tr>
         <th><strong>Email</strong></th>
         <th><strong>Account Id</strong></th>
+        <th><strong>User Id</strong></th>
         <th><strong>Name</strong></th>
         <th><strong>Parent</strong></th>
       </tr>
@@ -16,6 +17,7 @@
         <tr>
           <td>{{ result.email }}</td>
           <td>{{ result.account_id }}</td>
+          <td>{{ result.user_id }}</td>
           <td>{{ result.first_name }} {{ result.last_name }}</td>
           <td>{{ result.parent_account_id }}</td>
         </tr>
