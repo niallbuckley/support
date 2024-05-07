@@ -6,20 +6,27 @@
     <table>
       <thead>
       <tr>
-        <th><strong>Email</strong></th>
-        <th><strong>Account Id</strong></th>
-        <th><strong>User Id</strong></th>
         <th><strong>Name</strong></th>
+        <th><strong>Account Id</strong></th>
+        <th><strong>Cluster</strong></th>
+        <th><strong>Sw Group</strong></th>
         <th><strong>Parent</strong></th>
+        <th><strong>status</strong></th>
       </tr>
       </thead>
       <tbody v-for="result in results" :key="result.account_id">
         <tr>
-          <td>{{ result.email }}</td>
+          <td>{{ result.name }}</td>
           <td>{{ result.account_id }}</td>
-          <td>{{ result.user_id }}</td>
-          <td>{{ result.first_name }} {{ result.last_name }}</td>
+          <td>{{ result.cluster }}</td>
+          <td>{{ result.software_group }}</td>
           <td>{{ result.parent_account_id }}</td>
+          <td>
+            <span v-for="(flag, index) in result.status" :key="index">
+              {{ flag.trim() }}<span v-if="index !== result.status.length - 1">, 
+            </span>
+          </span>
+          </td>
         </tr>
       </tbody>
     </table> 

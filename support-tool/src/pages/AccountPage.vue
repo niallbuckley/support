@@ -9,9 +9,9 @@
       :results="vmsResults"
     ></account-vms-result>
     <sub-account-result
-      :isLoading="isLoadingUser"
-      :error="errorUser"
-      :results="userResults"
+      :isLoading="isLoadingSubAccount"
+      :error="errorSubAccount"
+      :results="subAccountResults"
     ></sub-account-result>
     <user-vms-result
       :isLoading="isLoadingUser"
@@ -111,6 +111,38 @@ export default {
           this.errorUser = `Could not get account user data, ${error.response.status} status code ${error.response.data.Message || error.response.data.message}`;
         });
     },
+    getSubAccountInfo(){
+      // Get user info from VMS
+      axios.get(`http://localhost:9992/api/v2/Account/${this.accountId}/SubAccounts`)
+      .then(response => {
+          if (response.status === 200) {
+            this.errorSubAccount = null;
+            return response.data;
+          }
+        }).then(data => {
+          console.log("Sub Accounts", data.data);
+          this.isLoadingSubAccount = false;
+          const results = [];
+          // This is a backend bug the Info endpoint will always return data even if the user id is not real
+          if (data.data[0].account_id !== ''){
+            for (var i=0; i < data.data.length; i++) {
+              var user = data.data[i]
+              console.log("user: ", user);
+              results.push(user);
+              console.log(this.subAccountResults);
+            }
+            this.subAccountResults = results;
+          }
+          else{
+            this.error = `The user id ${this.accountId} does not exist in vms database`
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          this.isLoadingSubAccount = false;
+          this.errorSubAccount = `Could not get account user data, ${error.response.status} status code ${error.response.data.Message || error.response.data.message}`;
+        });
+    },
     displayAccountInfo(){
       this.isLoadingVms = true;
       this.isLoadingUser = true;
@@ -118,6 +150,7 @@ export default {
       console.log("hello", this.accountId);
       this.getAccountInfo();
       this.getUserInfo();
+      this.getSubAccountInfo();
     }
   },
   watch: {
