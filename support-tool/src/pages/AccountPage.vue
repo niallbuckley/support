@@ -8,6 +8,11 @@
       :error="error"
       :results="vmsResults"
     ></account-vms-result>
+    <sub-account-result
+      :isLoading="isLoadingUser"
+      :error="errorUser"
+      :results="userResults"
+    ></sub-account-result>
     <user-vms-result
       :isLoading="isLoadingUser"
       :error="errorUser"
@@ -20,31 +25,33 @@
 import axios from 'axios';
 import AccountVmsResult from '../components/account/AccountVmsResult.vue';
 import UserVmsResult from '../components/account/UserVmsResult.vue';
+import SubAccountResult from '../components/account/SubAccountResult.vue';
 
 export default {
   components: {
     AccountVmsResult,
-    UserVmsResult
+    UserVmsResult,
+    SubAccountResult
   },
   data() {
     return {
       accountId: '',
+      // account vms component
       isLoadingVms: false,
       error: false,
       vmsResults: [],
+      // account end-users component
       isLoadingUser: false,
       errorUser: false,
-      userResults: []
+      userResults: [],
+      // sub-account component
+      isLoadingSubAccount: false,
+      errorSubAccount: false,
+      subAccountResults: []
     }
   },
   methods: {
-    displayUserInfor(){
-
-    },
-    displayAccountInfo(){
-      this.isLoadingVms = true;
-      this.isLoadingUser = true;
-      console.log("hello", this.accountId);
+    getAccountInfo(){
       // Get user info from VMS
       axios.get(`http://localhost:9992/api/v2/Account/${this.accountId}/Info`)
         .then(response => {
@@ -71,6 +78,8 @@ export default {
           this.isLoadingVms = false;
           this.error = `Could not get device data, ${error.response.status} status code ${error.response.data.Message || error.response.data.message}`;
         });
+    },
+    getUserInfo(){
       // Get user info from VMS
       axios.get(`http://localhost:9992/api/v2/Account/${this.accountId}/Users`)
       .then(response => {
@@ -101,6 +110,14 @@ export default {
           this.isLoadingUser = false;
           this.errorUser = `Could not get account user data, ${error.response.status} status code ${error.response.data.Message || error.response.data.message}`;
         });
+    },
+    displayAccountInfo(){
+      this.isLoadingVms = true;
+      this.isLoadingUser = true;
+      this.isLoadingSubAccount = true;
+      console.log("hello", this.accountId);
+      this.getAccountInfo();
+      this.getUserInfo();
     }
   },
   watch: {
