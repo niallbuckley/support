@@ -4,9 +4,9 @@
   <h2> {{ accountId }}</h2>
   <div>
     <account-vms-result
-      :isLoading="isLoadingVms"
-      :error="error"
-      :results="vmsResults"
+      :isLoading="isLoadingAccount"
+      :error="errorAccount"
+      :results="accountResults"
     ></account-vms-result>
     <sub-account-result
       :isLoading="isLoadingSubAccount"
@@ -44,9 +44,9 @@ export default {
     return {
       accountId: '',
       // account vms component
-      isLoadingVms: false,
-      error: false,
-      vmsResults: [],
+      isLoadingAccount: false,
+      errorAccount: false,
+      accountResults: [],
       // account end-users component
       isLoadingUser: false,
       errorUser: false,
@@ -63,122 +63,134 @@ export default {
   },
   methods: {
     getAccountInfo(){
-      // Get user info from VMS
-      axios.get(`http://localhost:9992/api/v2/Account/${this.accountId}/Info`)
-        .then(response => {
-          if (response.status === 200) {
-            this.error = null;
-            return response.data;
-          }
-        }).then(data => {
-          this.isLoadingVms = false;
-          // This is a backend bug the Info endpoint will always return data even if the user id is not real
-          console.log("Response", data.data);
-          if (data.data[0].account_id !== ''){
+      // Get account info from vms database
+      (async () => {
+        try {
+          const response = await axios.get(`http://localhost:9992/api/v2/Account/${this.accountId}/Info`);
+
+          this.isLoadingAccount = false;
+          if (response.status === 200){
+            this.errorAccount = null;
+            const data = response.data;
+
             const results = [];
-            results.push(data.data[0]);
-            this.vmsResults = results;
-            console.log(this.vmsResults);
+            // This is a backend bug the Info endpoint will always return data even if the user id is not real
+            if (data.data[0].account_id !== ''){
+              results.push(data.data[0]);
+              this.accountResults = results;
+            }
+            else{
+              this.errorAccount = `No information for account: ${this.accountId} exist in vms database`
+            }
           }
-          else{
-            this.error = `The user id ${this.accountId} does not exist in vms database`
-          }
-        })
-        .catch(error => {
+        } catch (error) {
+          // Handle error
           console.error(error);
-          this.isLoadingVms = false;
-          this.error = `Could not get device data, ${error.response.status} status code ${error.response.data.Message || error.response.data.message}`;
-        });
+          this.isLoadingAccount = false;
+          this.errorAccount = `Error while processing account information for ${this.accountId}, ${error.response.data.Message || error.response.data.message}`;
+        }
+      })();
     },
     getUserInfo(){
       // Get user info from VMS
-      axios.get(`http://localhost:9992/api/v2/Account/${this.accountId}/Users`)
-      .then(response => {
-          if (response.status === 200) {
-            this.errorUser = null;
-            return response.data;
-          }
-        }).then(data => {
+      (async () => {
+        try {
+          const response = await axios.get(`http://localhost:9992/api/v2/Account/${this.accountId}/Users`);
+
           this.isLoadingUser = false;
-          const results = [];
-          // This is a backend bug the Info endpoint will always return data even if the user id is not real
-          if (data.data[0].account_id !== ''){
-            for (var i=0; i < data.data.length; i++) {
-              var user = data.data[i]
-              results.push(user);
+          if (response.status === 200){
+            this.errorUser = null;
+            const data = response.data;
+
+            const results = [];
+            // This is a backend bug the Info endpoint will always return data even if the user id does not exist
+            if (data.data.length > 0){
+              for (var i=0; i < data.data.length; i++) {
+                var user = data.data[i]
+                results.push(user);
+              }
+              this.userResults = results;
             }
-            this.userResults = results;
+            else{
+              this.error = `No users for account: ${this.accountId} exist in vms database`
+            }
           }
-          else{
-            this.error = `The user id ${this.accountId} does not exist in vms database`
-          }
-        })
-        .catch(error => {
+        } catch (error) {
+          // Handle error
           console.error(error);
           this.isLoadingUser = false;
-          this.errorUser = `Could not get account user data, ${error.response.status} status code ${error.response.data.Message || error.response.data.message}`;
-        });
+          this.errorUser = `Error while processing sub account(s) for ${this.accountId}`;
+        }
+      })();
     },
     getSubAccountInfo(){
       // Get sub account info from VMS
-      axios.get(`http://localhost:9992/api/v2/Account/${this.accountId}/SubAccounts`)
-      .then(response => {
-          if (response.status === 200) {
-            this.errorSubAccount = null;
-            return response.data;
-          }
-        }).then(data => {
+      (async () => {
+        try {
+          const response = await axios.get(`http://localhost:9992/api/v2/Account/${this.accountId}/SubAccounts`);
+
           this.isLoadingSubAccount = false;
-          const results = [];
-          if (data.data.length >= 1){
-            for (var i=0; i < data.data.length; i++) {
-              var sub = data.data[i]
-              results.push(sub);
+          if (response.status === 200){
+            this.errorSubAccount = null;
+            const data = response.data;
+            
+            // parse the information 
+            const results = [];
+            if (data.data.length > 0){
+              for (var i=0; i < data.data.length; i++) {
+                var sub = data.data[i]
+                results.push(sub);
+              }
+              this.subAccountResults = results;
             }
-            this.subAccountResults = results;
+            else{
+              // No sub-accounts
+              this.errorSubAccount = ``
+            }
           }
-          else{
-            // No sub-accounts
-            this.errorSubAccount = ``
-          }
-        })
-        .catch(error => {
+        } catch (error) {
+          // Handle error
           console.error(error);
           this.isLoadingSubAccount = false;
           this.errorSubAccount = `Error while processing sub account(s) for ${this.accountId}`;
-        });
+        }
+      })();
     },
     getDeviceInfo(){
-      axios.get(`http://localhost:9992/api/v2/Account/${this.accountId}/Devices`)
-      .then(response => {
-          if (response.status === 200) {
-            this.errorDevice = null;
-            return response.data;
-          }
-        }).then(data => {
+      // Get accout device information. This will only return data when end-user account is given.
+      (async () => {
+        try {
+          const response = await axios.get(`http://localhost:9992/api/v2/Account/${this.accountId}/Devices`);
+
           this.isLoadingDevice = false;
-          const results = [];
-          if (data.data.length >= 1){
-            for (var i=0; i < data.data.length; i++) {
-              var device = data.data[i]
-              // accounts are included in Device call - backend bug?
-              if (device.type == "account"){
-                continue
+          if (response.status === 200){
+            this.errorDevice = null;
+            const data = response.data;
+            
+            // parse the information 
+            if (data.data.length > 0){
+              const results = [];
+              for (var i=0; i < data.data.length; i++) {
+                var device = data.data[i]
+                if (device.type == "account"){
+                  continue
+                }
+                results.push(device);
               }
-              results.push(device);
+              this.deviceResults = results;
             }
-            this.deviceResults = results;
+            else{
+              // No devices
+              this.errorDevice = ``
+            }
           }
-          else{
-            // No devices
-            this.errorDevice= ``
-          }
-        })
-        .catch(error => {
+        } catch (error) {
+          // Handle error
           console.error(error);
           this.isLoadingDevice = false;
           this.errorDevice = `Error while processing device(s) for ${this.accountId}`;
-        });
+        }
+      })();
     },
     displayAccountInfo(){
       this.isLoadingVms = true;
