@@ -43,7 +43,7 @@ export default {
   data() {
     return {
       accountId: '',
-      // account vms component
+      // account information component
       isLoadingAccount: false,
       errorAccount: false,
       accountResults: [],

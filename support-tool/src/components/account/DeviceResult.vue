@@ -43,30 +43,10 @@ export default {
 </script>
 
 <style scoped>
-table {
-  width: 100%; /* Make the table fill the webpage width */
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-
-/* Apply styles to table body cells (td) */
-td {
-  border: 1px solid #ddd; 
-}
-
-th {
-  background-color: #f2f2f2; 
-  border: 1px solid #ddd; 
-  padding: 8px;
-}
-
-/* Apply alternate background color to even rows */
-tr:nth-child(even) {
-  background-color: #f9f9f9; /* Lighter gray background for even rows */
-}
 th, td {
   text-align: center;
   vertical-align: middle;
-} 
+}
+@import '/src/assets/css/account.css'
 
 </style>
