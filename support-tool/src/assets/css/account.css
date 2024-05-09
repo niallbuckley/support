@@ -16,3 +16,30 @@ th {
 tr:nth-child(even) {
   background-color: #f9f9f9; /* Lighter gray background for even rows */
 }
+th, td {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+.collapsible h1 {
+  padding: 10px;
+  margin: 0;
+}
+
+.collapsible .collapse-box {
+  display: inline-block;
+  width: 24px; /* Adjust width and height as needed */
+  height: 24px;
+  text-align: center;
+  line-height: 22px; /* Center the "+" symbol vertically */
+  border: 1px solid #ccc; /* Border around the box */
+  border-radius: 4px; /* Rounded corners */
+}
+
+.collapsible .collapse-indicator.pointer {
+  cursor: pointer;
+}
+
+.collapsible .collapse-indicator:hover .collapse-box {
+  background-color: #ddd; /* Highlight on hover */
+}

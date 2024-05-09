@@ -1,8 +1,13 @@
 <template>
   <p v-if="isLoading">Loading...</p>
   <p v-else-if="!isLoading && error">{{ error }}</p>
-  <div v-else-if="results.length > 0">
-    <h1> Sub-Accounts </h1>
+  <div v-else-if="results.length > 0" class="collapsible">
+    <h1> SubAccounts 
+      <span class="collapse-indicator" :class="{ 'pointer': !collapsed }">
+        <span class="collapse-box" @click="toggleCollapse">{{ collapsed ? '+' : '-' }}</span>
+      </span>
+    </h1>
+    <div v-show="!collapsed">
     <table>
       <thead>
       <tr>
@@ -29,14 +34,19 @@
           </td>
         </tr>
       </tbody>
-    </table> 
+    </table>
+    </div>
   </div>
 </template>
 
 <script>
+import { ToggleCollapseMixin } from '@/mixins/ToggleCollapseMixin.js';
+
+
 export default {
+  mixins: [ToggleCollapseMixin],
   props: ['isLoading', 'error', 'results']
-}
+};
 
 </script>
 
